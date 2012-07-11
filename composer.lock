@@ -1,0 +1,27 @@
+{
+    "hash": "54510eb96b997b4a73744587d1c82a6b",
+    "packages": [
+        {
+            "package": "doctrine/common",
+            "version": "2.2.2"
+        },
+        {
+            "package": "symfony/symfony",
+            "version": "dev-issue-4031",
+            "source-reference": "dee6f9c9c286e2e13414a77fe3ace522d234d3a3",
+            "commit-date": "1341908169"
+        },
+        {
+            "package": "twig/twig",
+            "version": "v1.8.3"
+        }
+    ],
+    "packages-dev": null,
+    "aliases": [
+
+    ],
+    "minimum-stability": "beta",
+    "stability-flags": {
+        "symfony/symfony": 20
+    }
+}

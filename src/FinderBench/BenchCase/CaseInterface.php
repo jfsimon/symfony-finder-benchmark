@@ -1,6 +1,6 @@
 <?php
 
-namespace Benchmark\BenchCase;
+namespace FinderBench\BenchCase;
 
 use Symfony\Component\Finder\Adapter\AdapterInterface;
 

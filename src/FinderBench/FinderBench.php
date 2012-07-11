@@ -2,7 +2,7 @@
 
 namespace FinderBench;
 
-use FinderBench\Test\TestInterface;
+use FinderBench\BenchCase\CaseInterface;
 use Symfony\Component\Finder\Adapter\AdapterInterface;
 
 /**
@@ -10,22 +10,22 @@ use Symfony\Component\Finder\Adapter\AdapterInterface;
  */
 class FinderBench implements \Iterator
 {
-    private $tests;
+    private $cases;
     private $cursor;
     private $runner;
     private $files;
 
     public function __construct(CaseRunner $runner, FileTree $files)
     {
-        $this->tests  = array();
+        $this->cases  = array();
         $this->cursor = 0;
         $this->runner = $runner;
         $this->files  = $files;
     }
 
-    public function registerTest(TestInterface $test)
+    public function registerCase(CaseInterface $case)
     {
-        $this->tests[] = $test;
+        $this->cases[] = $case;
 
         return $this;
     }
@@ -44,7 +44,7 @@ class FinderBench implements \Iterator
 
     public function current()
     {
-        return $this->runner->run($this->tests[$this->cursor], $this->files->getRoot());
+        return $this->runner->run($this->cases[$this->cursor], $this->files->getRoot());
     }
 
     public function next()
@@ -59,7 +59,7 @@ class FinderBench implements \Iterator
 
     public function valid()
     {
-        return $this->cursor < count($this->tests);
+        return $this->cursor < count($this->cases);
     }
 
     public function rewind()

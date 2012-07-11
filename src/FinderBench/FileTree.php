@@ -9,8 +9,7 @@ use Symfony\Component\Filesystem\Filesystem;
  */
 class FileTree
 {
-    const MAX_SIZE  = 36;
-    const MAX_DEPTH = 36;
+    const NAME_CHARS = 'abcdefghijklmnopqrstuvwxyz0123456789';
 
     private $root;
     private $depth;
@@ -20,8 +19,8 @@ class FileTree
     public function __construct($root, $size, $depth)
     {
         $this->root  = $root;
-        $this->depth = min($depth, self::MAX_DEPTH);
-        $this->range = $this->buildRange(min($size, self::MAX_SIZE));
+        $this->depth = min($depth, strlen(self::NAME_CHARS));
+        $this->range = substr(self::NAME_CHARS, 0, min($size, strlen(self::NAME_CHARS)));
         $this->syst  = new Filesystem();
     }
 
@@ -31,7 +30,7 @@ class FileTree
         $this->syst->touch(array_map(function ($char) use ($prefix) { return $prefix.$char; }, $this->range));
 
         if ($depth < $this->depth) {
-            foreach ($this->range as $char) {
+            foreach ((array) $this->range as $char) {
                 $this->build($dir.DIRECTORY_SEPARATOR.$prefix.$char, $depth+1, $prefix.$char);
             }
         }
