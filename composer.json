@@ -1,0 +1,26 @@
+{
+    "name": "symfony/finder-benchmark",
+    "description": "Benchmark for Symfony2 Finder component",
+    "homepage": "https://github.com/jfsimon/symfony-finder-benchmark",
+    "type": "library",
+    "license": "MIT",
+    "authors": [{
+        "name": "Jean-François Simon",
+        "email": "contact@jfsimon.fr"
+    }],
+    "support": {
+        "issues": "https://github.com/jfsimon/symfony-finder-benchmark/issues"
+    },
+    "autoload": {
+        "psr-0": { "": "src/" }
+    },
+    "bin": ["bin/benchmark"],
+    "repositories": [{
+        "type": "git",
+        "url": "https://github.com/jfsimon/symfony"
+    }],
+    "require": {
+        "jfsimon/symfony": "dev-issue-4031"
+    },
+    "minimum-stability": "beta"
+}
