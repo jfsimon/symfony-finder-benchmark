@@ -7,7 +7,7 @@ use Symfony\Component\Filesystem\Filesystem;
 /**
  * @author Jean-François Simon <contact@jfsimon.fr>
  */
-class FileTree
+class FilesTree
 {
     const NAME_CHARS = 'abcdefghijklmnopqrstuvwxyz0123456789';
 
@@ -20,18 +20,22 @@ class FileTree
     {
         $this->root  = $root;
         $this->depth = min($depth, strlen(self::NAME_CHARS));
-        $this->range = substr(self::NAME_CHARS, 0, min($size, strlen(self::NAME_CHARS)));
+        $this->range = str_split(substr(self::NAME_CHARS, 0, min($size, strlen(self::NAME_CHARS))));
         $this->syst  = new Filesystem();
     }
 
-    public function build($dir = '', $depth = 0, $prefix = '')
+    public function build($root = '', $depth = 0, $prefix = '')
     {
-        $this->syst->mkdir($this->root.DIRECTORY_SEPARATOR.$dir);
-        $this->syst->touch(array_map(function ($char) use ($prefix) { return $prefix.$char; }, $this->range));
+        $root = $root ?: $this->root;
+
+        $this->syst->mkdir($root);
+        $this->syst->touch(array_map(function ($char) use ($root, $prefix) {
+            return $root.DIRECTORY_SEPARATOR.$prefix.$char.'.file';
+        }, $this->range));
 
         if ($depth < $this->depth) {
-            foreach ((array) $this->range as $char) {
-                $this->build($dir.DIRECTORY_SEPARATOR.$prefix.$char, $depth+1, $prefix.$char);
+            foreach ($this->range as $char) {
+                $this->build($root.DIRECTORY_SEPARATOR.$prefix.$char, $depth+1, $prefix.$char);
             }
         }
 

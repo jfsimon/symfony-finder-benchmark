@@ -3,6 +3,7 @@
 namespace FinderBench;
 
 use FinderBench\BenchCase\CaseInterface;
+use Symfony\Component\Finder\Adapter\AdapterInterface;
 
 /**
  * @author Jean-François Simon <contact@jfsimon.fr>
@@ -10,40 +11,24 @@ use FinderBench\BenchCase\CaseInterface;
 class CaseRunner
 {
     private $iterations;
+    private $root;
     private $adapters;
 
-    public function __construct($iterations)
+    public function __construct($iterations, $root)
     {
         $this->iterations = $iterations;
+        $this->root       = $root;
         $this->adapters   = array();
     }
 
-    public function registerAdapter($adapter)
-    {
-        if ($adapter->isSupported()) {
-            $this->adapters[] = $adapter;
-        }
-
-        return $this;
-    }
-
-    public function getValidAdapters()
-    {
-        return $this->adapters;
-    }
-
-    public function run(CaseInterface $test, $root)
+    public function run(CaseInterface $test, AdapterInterface $adapter)
     {
         $times = array();
 
-        foreach ($this->adapters as $adapter) {
-            $times[$adapter->getName()] = array();
-
-            for ($iteration = 0; $iteration < $this->iterations; $iteration ++) {
-                $times[$adapter->getName()][] = $test->run($adapter, $root);
-            }
+        for ($iteration = 0; $iteration < $this->iterations; $iteration ++) {
+            $times[$adapter->getName()][] = $test->run($adapter, $this->root);
         }
 
-        return new Report($times);
+        return count($times) > 0 ? array_sum($times) / count($times) : null;
     }
 }

@@ -7,25 +7,29 @@ namespace FinderBench;
  */
 class Report
 {
-    private $times;
+    private $cases;
 
-    public function __construct(array $times)
+    public function add($case, $adapter, $time)
     {
-        $this->times = $times;
+        if (!isset($this->cases[$case])) {
+            $this->cases[$case] = array();
+        }
+
+        if (!isset($this->cases[$case][$adapter])) {
+            $this->cases[$case][$adapter] = array();
+        }
+
+        $this->cases[$case][$adapter][] = $time;
     }
 
-    public function getAverageTime($adapter)
+    public function computeTime($case, $adapter)
     {
-        if (!isset($this->times[$adapter])) {
+        if (!isset($this->cases[$case][$adapter])) {
             return null;
         }
 
-        $total = 0;
+        $count = count($this->cases[$case][$adapter]);
 
-        foreach ($this->times[$adapter] as $time) {
-            $total += $time;
-        }
-
-        return $total / count($this->times[$adapter]);
+        return 0 === $count ? null : array_sum($this->cases[$case][$adapter]) / $count;
     }
 }

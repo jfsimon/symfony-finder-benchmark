@@ -8,19 +8,19 @@ use Symfony\Component\Finder\Adapter\AdapterInterface;
 /**
  * @author Jean-François Simon <contact@jfsimon.fr>
  */
-class FinderBench implements \Iterator
+class FinderBench
 {
     private $cases;
-    private $cursor;
-    private $runner;
+    private $adapters;
     private $files;
+    private $runner;
 
-    public function __construct(CaseRunner $runner, FileTree $files)
+    public function __construct(FilesTree $files, CaseRunner $runner)
     {
-        $this->cases  = array();
-        $this->cursor = 0;
-        $this->runner = $runner;
-        $this->files  = $files;
+        $this->cases    = array();
+        $this->adapters = array();
+        $this->files    = $files;
+        $this->runner   = $runner;
     }
 
     public function registerCase(CaseInterface $case)
@@ -32,38 +32,26 @@ class FinderBench implements \Iterator
 
     public function registerAdapter(AdapterInterface $adapter)
     {
-        $this->runner->registerAdapter($adapter);
+        $this->adapters[] = $adapter;
 
         return $this;
     }
 
-    public function getValidAdapters()
+    public function buildReport()
     {
-        return $this->runner->getValidAdapters();
-    }
+        $this->files->build();
 
-    public function current()
-    {
-        return $this->runner->run($this->cases[$this->cursor], $this->files->getRoot());
-    }
+        $report = new Report();
 
-    public function next()
-    {
-        $this->cursor ++;
-    }
+        foreach ($this->cases as $case) {
+            foreach ($this->adapters as $adapter) {
+                $time = $this->runner->run($case, $adapter);
+                $report->add($case->getName(), $adapter->getName(), $time);
+            }
+        }
 
-    public function key()
-    {
-        return $this->cursor;
-    }
+//        $this->files->remove();
 
-    public function valid()
-    {
-        return $this->cursor < count($this->cases);
-    }
-
-    public function rewind()
-    {
-        $this->cursor = 0;
+        return $report;
     }
 }

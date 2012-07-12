@@ -1,6 +1,6 @@
 <?php
 
-namespace Benchmark\BenchCase;
+namespace FinderBench\BenchCase;
 
 use Symfony\Component\Finder\Adapter\AdapterInterface;
 use Symfony\Component\Finder\Finder;
@@ -15,7 +15,8 @@ abstract class AbstractCase implements CaseInterface
         $timestamp = $this->getTimestamp();
         $finder    = Finder::create()->removeAdapters()->register($adapter);
 
-        foreach ($this->buildFinder($finder)->in($root) as $file) {
+        $this->buildFinder($finder);
+        foreach ($finder->in($root) as $file) {
             continue;
         }
 
@@ -26,6 +27,6 @@ abstract class AbstractCase implements CaseInterface
 
     private function getTimestamp()
     {
-        return microtime(true);
+        return microtime(true) * 1000;
     }
 }

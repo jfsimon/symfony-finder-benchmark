@@ -8,6 +8,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
+use FinderBench\Command\RunCommand;
 
 /**
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
@@ -35,6 +36,7 @@ class Application extends BaseApplication
     protected function getDefaultCommands()
     {
         $commands = parent::getDefaultCommands();
+        $commands[] = new RunCommand();
 
         return $commands;
     }
@@ -42,7 +44,7 @@ class Application extends BaseApplication
     protected function getDefaultHelperSet()
     {
         $helperSet = parent::getDefaultHelperSet();
-        $helperSet->set(new ReportHelper());
+        $helperSet->set(new ReportFormatterHelper($this->getTerminalWidth()));
 
         return $helperSet;
     }
