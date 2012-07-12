@@ -46,14 +46,22 @@ class RunCommand extends Command
 
         $this
             ->getHelper('report')
-            ->addDetails($bench)->write($output)
-            ->addHeader($adapters)->addReport($bench->buildReport(), $cases, $adapters)->write($output);
+            ->addDetails($bench)
+            ->write($output)
+            ->addHeader($adapters)
+            ->addReport($bench->buildReport(), $cases, $adapters)
+            ->addCases($cases)
+            ->write($output);
     }
 
     private function getCases()
     {
         return array(
             new BenchCase\NameContainsCase(array('a*'), array()),
+            new BenchCase\ComposedCase(array(
+                new BenchCase\NameContainsCase(array('a*'), array()),
+                new BenchCase\NameContainsCase(array('a*'), array('*b'))
+            )),
         );
     }
 

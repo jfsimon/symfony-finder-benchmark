@@ -8,6 +8,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Formatter\OutputFormatterStyle;
+use Symfony\Component\Console\Helper\HelperSet;
 use FinderBench\Command\RunCommand;
 
 /**
@@ -27,6 +28,7 @@ class Application extends BaseApplication
                 'fastest' => new OutputFormatterStyle('white', 'green'),
                 'average' => new OutputFormatterStyle('white', 'black'),
                 'slowest' => new OutputFormatterStyle('white', 'red'),
+                'title'   => new OutputFormatterStyle('white', 'blue'),
             )));
         }
 
@@ -43,9 +45,9 @@ class Application extends BaseApplication
 
     protected function getDefaultHelperSet()
     {
-        return array(
-            new FormatterHelper(),
-            new ReportHelper($this->getTerminalWidth()),
-        );
+        return new HelperSet(array(
+            $formatter = new FormatterHelper(),
+            new ReportHelper($formatter, $this->getTerminalWidth()),
+        ));
     }
 }

@@ -12,14 +12,14 @@ class FormatterHelper extends BaseFormatterHelper
     const ALIGN_LEFT  = 'left';
     const ALIGN_RIGHT = 'right';
 
-    public function formatCell($text, $width, $align = self::ALIGN_LEFT)
+    public function formatCell($text, $width, $align = self::ALIGN_LEFT, $style = null)
     {
         $length = strlen($text);
 
         if ($length > $width) {
             switch ($align) {
-                case self::ALIGN_LEFT:  return substr($text, $width);
-                case self::ALIGN_RIGHT: return substr($text, $width-$length);
+                case self::ALIGN_LEFT:  return $this->formatStyle(substr($text, $width), $style);
+                case self::ALIGN_RIGHT: return $this->formatStyle(substr($text, $width-$length), $style);
             }
 
             throw new \InvalidArgumentException('Unknown alignment: '.$align);
@@ -29,11 +29,24 @@ class FormatterHelper extends BaseFormatterHelper
             $space = str_repeat(' ', $width - $length);
 
             switch ($align) {
-                case self::ALIGN_LEFT:  return $text.$space;
-                case self::ALIGN_RIGHT: return $space.$text;
+                case self::ALIGN_LEFT:  return $this->formatStyle($text.$space, $style);
+                case self::ALIGN_RIGHT: return $this->formatStyle($space.$text, $style);
             }
 
             throw new \InvalidArgumentException('Unknown alignment: '.$align);
+        }
+
+        if (null !== $style) {
+            $text = sprintf('<%s>%s</%s>', $style, $text, $style);
+        }
+
+        return $this->formatStyle($text, $style);
+    }
+
+    public function formatStyle($text, $style = null)
+    {
+        if (null !== $style) {
+            return sprintf('<%s>%s</%s>', $style, $text, $style);
         }
 
         return $text;

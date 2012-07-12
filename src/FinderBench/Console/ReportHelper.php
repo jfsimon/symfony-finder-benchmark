@@ -12,8 +12,7 @@ use FinderBench\FinderBench;
  */
 class ReportHelper extends Helper
 {
-    const CELL_WIDTH    = 10;
-    const HEADING_WIDTH = 50;
+    const CELL_WIDTH = 10;
 
     const ALIGN_LEFT  = 'left';
     const ALIGN_RIGHT = 'right';
@@ -31,39 +30,56 @@ class ReportHelper extends Helper
 
     public function addDetails(FinderBench $bench)
     {
-        $this->buffer.= $this->formatter->formatBlock('Starting benchmark, it could take a while...', 'comment', true)."\n\n";
+        $this->buffer.= "\n";
+        $this->buffer.= $this->formatter->formatBlock('Starting benchmark, it could take a while...', 'title', true)."\n";
+        $this->buffer.= "\n<comment>";
         $this->buffer.= $this->formatter->formatCell($bench->getFiles()->getFilesCount(), self::CELL_WIDTH, FormatterHelper::ALIGN_RIGHT)." files\n";
         $this->buffer.= $this->formatter->formatCell($bench->getFiles()->getDirsCount(), self::CELL_WIDTH, FormatterHelper::ALIGN_RIGHT)." directories\n";
         $this->buffer.= $this->formatter->formatCell(count($bench->getCases()), self::CELL_WIDTH, FormatterHelper::ALIGN_RIGHT)." bench cases\n";
         $this->buffer.= $this->formatter->formatCell(count($bench->getAdapters()), self::CELL_WIDTH, FormatterHelper::ALIGN_RIGHT)." supported adapters\n";
+        $this->buffer.= "</comment>\n";
 
         return $this;
     }
 
     public function addHeader(array $adapters)
     {
-        $this->addString('Bench case', $this->computeHeadingWidth(count($adapters)));
+        $this->buffer.= ' '.$this->formatter->formatCell('case', self::CELL_WIDTH, FormatterHelper::ALIGN_LEFT, 'title');
 
         foreach ($adapters as $adapter) {
-            $this->buffer.= ' '.$this->formatter->formatCell($adapter->getName(), self::TIME_WIDTH);
+            $this->buffer.= ' '.$this->formatter->formatCell($adapter->getName(), self::CELL_WIDTH, FormatterHelper::ALIGN_RIGHT, 'title');
         }
 
-        $this->buffer.= "\n\n";
+        $this->buffer.= "\n";
 
         return $this;
     }
 
     public function addReport(Report $report, array $cases, array $adapters)
     {
-        foreach ($cases as $case) {
-            $this->addString($case->getDescription(), $this->computeHeadingWidth(count($adapters)));
+        foreach ($cases as $index => $case) {
+            $this->buffer.= ' '.$this->formatter->formatCell($index, self::CELL_WIDTH);
 
             foreach ($adapters as $adapter) {
                 $this->addTime($report, $case->getName(), $adapter->getName());
             }
 
-            $this->buffer.= "\n";
+            $this->buffer.= "\n\n";
         }
+
+        return $this;
+    }
+
+    public function addCases(array $cases)
+    {
+        $this->buffer.= '<comment>';
+
+        foreach ($cases as $index => $case) {
+            $this->buffer.= $this->formatter->formatCell($index, self::CELL_WIDTH, FormatterHelper::ALIGN_RIGHT);
+            $this->buffer.= ' '.$case->getDescription()."\n";
+        }
+
+        $this->buffer.= "</comment>\n";
 
         return $this;
     }
@@ -81,25 +97,11 @@ class ReportHelper extends Helper
         return 'report';
     }
 
-    private function addString($string, $width, $align = self::ALIGN_LEFT)
-    {
-        $length = strlen($string);
-
-        if ($length > $width) {
-            $this->buffer.= substr($string, $width);
-        } elseif ($length < $width) {
-            $this->buffer.= $string.str_repeat(' ', $width - $length);
-        } else {
-            $this->buffer.= $string;
-        }
-    }
-
     private function addTime(Report $report, $case, $adapter)
     {
         $time = $report->computeTime($case, $adapter);
         $str  = null === $time ? '' : (string) round($time);
 
-        $this->buffer.= ' ';
-        $this->addString($str, self::TIME_WIDTH);
+        $this->buffer.= ' '.$this->formatter->formatCell($str, self::CELL_WIDTH, FormatterHelper::ALIGN_RIGHT);
     }
 }
