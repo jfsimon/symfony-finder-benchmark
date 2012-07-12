@@ -12,21 +12,21 @@ abstract class AbstractCase implements CaseInterface
 {
     public function run(AdapterInterface $adapter, $root)
     {
-        $timestamp = $this->getTimestamp();
-        $finder    = Finder::create()->removeAdapters()->register($adapter);
+        $time   = $this->getMicrotime();
+        $finder = Finder::create()->removeAdapters()->register($adapter);
 
         $this->buildFinder($finder);
         foreach ($finder->in($root) as $file) {
             continue;
         }
 
-        return $this->getTimestamp() - $timestamp;
+        return $this->getMicrotime() - $time;
     }
 
     protected abstract function buildFinder(Finder $finder);
 
-    private function getTimestamp()
+    private function getMicrotime()
     {
-        return microtime(true) * 1000;
+        return microtime(true) * 1000000;
     }
 }

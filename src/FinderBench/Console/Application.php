@@ -43,9 +43,9 @@ class Application extends BaseApplication
 
     protected function getDefaultHelperSet()
     {
-        $helperSet = parent::getDefaultHelperSet();
-        $helperSet->set(new ReportFormatterHelper($this->getTerminalWidth()));
-
-        return $helperSet;
+        return array(
+            new FormatterHelper(),
+            new ReportHelper($this->getTerminalWidth()),
+        );
     }
 }

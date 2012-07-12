@@ -26,9 +26,11 @@ class CaseRunner
         $times = array();
 
         for ($iteration = 0; $iteration < $this->iterations; $iteration ++) {
-            $times[$adapter->getName()][] = $test->run($adapter, $this->root);
+            $times[] = $test->run($adapter, $this->root);
         }
 
-        return count($times) > 0 ? array_sum($times) / count($times) : null;
+        $count = count($times);
+
+        return $count > 0 ? array_sum($times) / $count : null;
     }
 }

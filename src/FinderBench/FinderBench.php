@@ -32,7 +32,9 @@ class FinderBench
 
     public function registerAdapter(AdapterInterface $adapter)
     {
-        $this->adapters[] = $adapter;
+        if ($adapter->isSupported()) {
+            $this->adapters[] = $adapter;
+        }
 
         return $this;
     }
@@ -50,8 +52,23 @@ class FinderBench
             }
         }
 
-//        $this->files->remove();
+        $this->files->remove();
 
         return $report;
+    }
+
+    public function getFiles()
+    {
+        return $this->files;
+    }
+
+    public function getAdapters()
+    {
+        return $this->adapters;
+    }
+
+    public function getCases()
+    {
+        return $this->cases;
     }
 }

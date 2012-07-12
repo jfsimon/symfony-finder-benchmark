@@ -24,9 +24,9 @@ class RunCommand extends Command
             ->setDescription('Runs benchmark.')
 
             ->addOption('root',       'r', InputOption::VALUE_REQUIRED, 'Workspace root dir', sys_get_temp_dir().DIRECTORY_SEPARATOR.'finder-bench')
-            ->addOption('size',       's', InputOption::VALUE_REQUIRED, 'Files tree size',    2)
-            ->addOption('depth',      'd', InputOption::VALUE_REQUIRED, 'Files tree depth',   4)
-            ->addOption('iterations', 'i', InputOption::VALUE_REQUIRED, 'Bench iterations',   1)
+            ->addOption('size',       's', InputOption::VALUE_REQUIRED, 'Files tree size',    10)
+            ->addOption('depth',      'd', InputOption::VALUE_REQUIRED, 'Files tree depth',   3)
+            ->addOption('iterations', 'i', InputOption::VALUE_REQUIRED, 'Bench iterations',   10)
         ;
     }
 
@@ -44,10 +44,10 @@ class RunCommand extends Command
             $bench->registerAdapter($adapter);
         }
 
-        $this->getHelper('report')
-            ->formatDetails($output, $bench)
-            ->formatHeader($output, $adapters)
-            ->formatReport($output, $bench->buildReport(), $cases, $adapters);
+        $this
+            ->getHelper('report')
+            ->addDetails($bench)->write($output)
+            ->addHeader($adapters)->addReport($bench->buildReport(), $cases, $adapters)->write($output);
     }
 
     private function getCases()
