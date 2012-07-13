@@ -21,9 +21,23 @@ class CaseRunner
         $this->adapters   = array();
     }
 
-    public function run(CaseInterface $test, AdapterInterface $adapter)
+    public function run(CaseInterface $case, array $adapters)
+    {
+        $report = new CaseReport();
+
+        foreach ($adapters as $adapter) {
+            $report->add($adapter->getName(), $this->runOne($case, $adapter));
+        }
+
+        return $report;
+    }
+
+    private function runOne(CaseInterface $test, AdapterInterface $adapter)
     {
         $times = array();
+
+        // file system warmup
+        $test->run($adapter, $this->root);
 
         for ($iteration = 0; $iteration < $this->iterations; $iteration ++) {
             $times[] = $test->run($adapter, $this->root);

@@ -4,105 +4,76 @@ namespace FinderBench\Console;
 
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Output\OutputInterface;
-use FinderBench\Report;
-use FinderBench\FinderBench;
+use FinderBench\CaseReport;
 
 /**
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
  */
 class ReportHelper extends Helper
 {
-    const CELL_WIDTH = 10;
+    const CELL_WIDTH  = 15;
+    const VALUE_WIDTH = 7;
 
     const ALIGN_LEFT  = 'left';
     const ALIGN_RIGHT = 'right';
 
     private $formatter;
-    private $width;
-    private $buffer;
 
-    public function __construct(FormatterHelper $formatter, $width)
+    public function __construct(FormatterHelper $formatter)
     {
         $this->formatter = $formatter;
-        $this->width     = $width;
-        $this->buffer    = '';
     }
 
-    public function addDetails(FinderBench $bench)
+    public function formatDetails(array $details)
     {
-        $this->buffer.= "\n";
-        $this->buffer.= $this->formatter->formatBlock('Starting benchmark, it takes several minutes...', 'title', true)."\n";
-        $this->buffer.= "\n";
-        $this->buffer.= '<info>'.$this->formatter->formatCell($bench->getFiles()->getFilesCount(), self::CELL_WIDTH, FormatterHelper::ALIGN_RIGHT)."</info> <comment>files</comment>\n";
-        $this->buffer.= '<info>'.$this->formatter->formatCell($bench->getFiles()->getDirsCount(), self::CELL_WIDTH, FormatterHelper::ALIGN_RIGHT)."</info> <comment>directories</comment>\n";
-        $this->buffer.= '<info>'.$this->formatter->formatCell($bench->getIterations(), self::CELL_WIDTH, FormatterHelper::ALIGN_RIGHT)."</info> <comment>iterations</comment>\n";
-        $this->buffer.= '<info>'.$this->formatter->formatCell(count($bench->getCases()), self::CELL_WIDTH, FormatterHelper::ALIGN_RIGHT)."</info> <comment>bench cases</comment>\n";
-        $this->buffer.= '<info>'.$this->formatter->formatCell(count($bench->getAdapters()), self::CELL_WIDTH, FormatterHelper::ALIGN_RIGHT)."</info> <comment>supported adapters</comment>\n";
-        $this->buffer.= "\n";
+        $str = "\n".$this->formatter->formatBlock('Starting benchmark, it takes several minutes...', 'title', true)."\n\n";
 
-        return $this;
+        foreach ($details as $label => $value) {
+            $str.= '<info>'
+                .$this->formatter->formatCell($value, self::VALUE_WIDTH, FormatterHelper::ALIGN_RIGHT)
+                ."</info> <comment>$label</comment>\n";
+        }
+
+        return $str."\n";
     }
 
-    public function addHeader(array $adapters)
+    public function formatHeader(array $adapters)
     {
-        $this->buffer.= ' '.$this->formatter->formatCell('case', self::CELL_WIDTH, FormatterHelper::ALIGN_RIGHT, 'title');
+        $str = ' '.$this->formatter->formatCell('case', self::CELL_WIDTH, FormatterHelper::ALIGN_RIGHT, 'title');
 
         foreach ($adapters as $adapter) {
-            $this->buffer.= ' '.$this->formatter->formatCell($adapter->getName(), self::CELL_WIDTH, FormatterHelper::ALIGN_RIGHT, 'title');
+            $str.= ' '.$this->formatter->formatCell($adapter->getName(), self::CELL_WIDTH, FormatterHelper::ALIGN_RIGHT, 'title');
         }
 
-        $this->buffer.= "\n";
-
-        return $this;
+        return $str."\n";
     }
 
-    public function addReport(Report $report, array $cases, array $adapters)
+    public function formatCase(CaseReport $report, $index)
     {
-        foreach ($cases as $index => $case) {
-            $this->buffer.= ' '.$this->formatter->formatCell($index, self::CELL_WIDTH, FormatterHelper::ALIGN_RIGHT);
+        $str = ' '.$this->formatter->formatCell($index, self::CELL_WIDTH, FormatterHelper::ALIGN_RIGHT);
 
-            foreach ($adapters as $adapter) {
-                $this->addTime($report, $case->getName(), $adapter->getName());
-            }
 
-            $this->buffer.= "\n";
+        foreach ($report->getTimes() as $time) {
+            $str.= ' '.$this->formatter->formatCell(null === $time ? '' : $this->formatter->formatNumber(round($time)), self::CELL_WIDTH, FormatterHelper::ALIGN_RIGHT);
         }
 
-        return $this;
+        return $str."\n";
     }
 
-    public function addCases(array $cases)
+    public function formatCases(array $cases)
     {
-        $this->buffer.= "\n<comment>";
+        $str = "\n<comment>";
 
         foreach ($cases as $index => $case) {
-            $this->buffer.= '<info>'.$this->formatter->formatCell($index, self::CELL_WIDTH, FormatterHelper::ALIGN_RIGHT).'</info>';
-            $this->buffer.= ' '.$case->getDescription()."\n";
+            $str.= '<info>'.$this->formatter->formatCell($index, self::VALUE_WIDTH, FormatterHelper::ALIGN_RIGHT).'</info>';
+            $str.= ' '.$case->getDescription()."\n";
         }
 
-        $this->buffer.= "</comment>\n";
-
-        return $this;
-    }
-
-    public function write(OutputInterface $output)
-    {
-        $output->write($this->buffer);
-        $this->buffer = '';
-
-        return $this;
+        return $str."</comment>\n";
     }
 
     public function getName()
     {
         return 'report';
-    }
-
-    private function addTime(Report $report, $case, $adapter)
-    {
-        $time = $report->computeTime($case, $adapter);
-        $str  = null === $time ? '' : (string) round($time);
-
-        $this->buffer.= ' '.$this->formatter->formatCell($str, self::CELL_WIDTH, FormatterHelper::ALIGN_RIGHT);
     }
 }

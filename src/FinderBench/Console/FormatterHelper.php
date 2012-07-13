@@ -12,6 +12,13 @@ class FormatterHelper extends BaseFormatterHelper
     const ALIGN_LEFT  = 'left';
     const ALIGN_RIGHT = 'right';
 
+    private $numberFormatter;
+
+    public function __construct()
+    {
+        $this->numberFormatter = new \NumberFormatter('en', \NumberFormatter::DEFAULT_STYLE);
+    }
+
     public function formatCell($text, $width, $align = self::ALIGN_LEFT, $style = null)
     {
         $length = strlen($text);
@@ -50,5 +57,10 @@ class FormatterHelper extends BaseFormatterHelper
         }
 
         return $text;
+    }
+
+    public function formatNumber($number)
+    {
+        return $this->numberFormatter->format($number);
     }
 }

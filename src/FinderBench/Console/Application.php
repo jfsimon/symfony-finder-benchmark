@@ -18,6 +18,9 @@ use FinderBench\BenchCase;
  */
 class Application extends BaseApplication
 {
+    private $cases;
+    private $adapters;
+
     public function __construct()
     {
         parent::__construct('FinderBench', 'Beta');
@@ -34,12 +37,7 @@ class Application extends BaseApplication
             )));
         }
 
-        return parent::run($input, $output);
-    }
-
-    public function getCases()
-    {
-        return array(
+        $this->cases = array(
             new BenchCase\NameContainsCase(array('a*'), array()),
             new BenchCase\ComposedCase(array(
                 new BenchCase\NameContainsCase(array('a*'), array()),
@@ -65,21 +63,32 @@ class Application extends BaseApplication
                 new BenchCase\ValuedCase('size', 2),
             )),
         );
+
+        $this->adapters = array(
+            new Adapter\PhpAdapter(),
+            new Adapter\GnuFindAdapter(),
+        );
+
+        return parent::run($input, $output);
+    }
+
+    public function getCases()
+    {
+        return $this->cases;
     }
 
     public function getAdapters()
     {
-        return array(
-            new Adapter\PhpAdapter(),
-            new Adapter\GnuFindAdapter(),
-        );
+        return $this->adapters;
     }
 
     protected function getDefaultCommands()
     {
         $commands = parent::getDefaultCommands();
         $commands[] = new Command\RunCommand();
+        $commands[] = new Command\InitCommand();
         $commands[] = new Command\CaseCommand();
+        $commands[] = new Command\FinalizeCommand();
 
         return $commands;
     }
