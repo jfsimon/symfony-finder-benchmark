@@ -26,7 +26,7 @@ class RunCommand extends Command
             ->addOption('root',       'r', InputOption::VALUE_REQUIRED, 'Workspace root dir', sys_get_temp_dir().DIRECTORY_SEPARATOR.'finder-bench')
             ->addOption('size',       's', InputOption::VALUE_REQUIRED, 'Files tree size',    10)
             ->addOption('depth',      'd', InputOption::VALUE_REQUIRED, 'Files tree depth',   3)
-            ->addOption('iterations', 'i', InputOption::VALUE_REQUIRED, 'Bench iterations',   10)
+            ->addOption('iterations', 'i', InputOption::VALUE_REQUIRED, 'Bench iterations',   1)
         ;
     }
 
@@ -36,11 +36,11 @@ class RunCommand extends Command
         $files  = new FilesTree($input->getOption('root'), $input->getOption('size'), $input->getOption('depth'));
         $bench  = new FinderBench($files, $runner);
 
-        foreach ($cases = $this->getCases() as $case) {
+        foreach ($cases = $this->getApplication()->getCases() as $case) {
             $bench->registerCase($case);
         }
 
-        foreach ($adapters = $this->getAdapters() as $adapter) {
+        foreach ($adapters = $this->getApplication()->getAdapters() as $adapter) {
             $bench->registerAdapter($adapter);
         }
 
@@ -52,24 +52,5 @@ class RunCommand extends Command
             ->addReport($bench->buildReport(), $cases, $adapters)
             ->addCases($cases)
             ->write($output);
-    }
-
-    private function getCases()
-    {
-        return array(
-            new BenchCase\NameContainsCase(array('a*'), array()),
-            new BenchCase\ComposedCase(array(
-                new BenchCase\NameContainsCase(array('a*'), array()),
-                new BenchCase\NameContainsCase(array('a*'), array('*b'))
-            )),
-        );
-    }
-
-    private function getAdapters()
-    {
-        return array(
-            new Adapter\PhpAdapter(),
-            new Adapter\GnuFindAdapter(),
-        );
     }
 }

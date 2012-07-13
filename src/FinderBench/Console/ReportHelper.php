@@ -31,20 +31,21 @@ class ReportHelper extends Helper
     public function addDetails(FinderBench $bench)
     {
         $this->buffer.= "\n";
-        $this->buffer.= $this->formatter->formatBlock('Starting benchmark, it could take a while...', 'title', true)."\n";
-        $this->buffer.= "\n<comment>";
-        $this->buffer.= $this->formatter->formatCell($bench->getFiles()->getFilesCount(), self::CELL_WIDTH, FormatterHelper::ALIGN_RIGHT)." files\n";
-        $this->buffer.= $this->formatter->formatCell($bench->getFiles()->getDirsCount(), self::CELL_WIDTH, FormatterHelper::ALIGN_RIGHT)." directories\n";
-        $this->buffer.= $this->formatter->formatCell(count($bench->getCases()), self::CELL_WIDTH, FormatterHelper::ALIGN_RIGHT)." bench cases\n";
-        $this->buffer.= $this->formatter->formatCell(count($bench->getAdapters()), self::CELL_WIDTH, FormatterHelper::ALIGN_RIGHT)." supported adapters\n";
-        $this->buffer.= "</comment>\n";
+        $this->buffer.= $this->formatter->formatBlock('Starting benchmark, it takes several minutes...', 'title', true)."\n";
+        $this->buffer.= "\n";
+        $this->buffer.= '<info>'.$this->formatter->formatCell($bench->getFiles()->getFilesCount(), self::CELL_WIDTH, FormatterHelper::ALIGN_RIGHT)."</info> <comment>files</comment>\n";
+        $this->buffer.= '<info>'.$this->formatter->formatCell($bench->getFiles()->getDirsCount(), self::CELL_WIDTH, FormatterHelper::ALIGN_RIGHT)."</info> <comment>directories</comment>\n";
+        $this->buffer.= '<info>'.$this->formatter->formatCell($bench->getIterations(), self::CELL_WIDTH, FormatterHelper::ALIGN_RIGHT)."</info> <comment>iterations</comment>\n";
+        $this->buffer.= '<info>'.$this->formatter->formatCell(count($bench->getCases()), self::CELL_WIDTH, FormatterHelper::ALIGN_RIGHT)."</info> <comment>bench cases</comment>\n";
+        $this->buffer.= '<info>'.$this->formatter->formatCell(count($bench->getAdapters()), self::CELL_WIDTH, FormatterHelper::ALIGN_RIGHT)."</info> <comment>supported adapters</comment>\n";
+        $this->buffer.= "\n";
 
         return $this;
     }
 
     public function addHeader(array $adapters)
     {
-        $this->buffer.= ' '.$this->formatter->formatCell('case', self::CELL_WIDTH, FormatterHelper::ALIGN_LEFT, 'title');
+        $this->buffer.= ' '.$this->formatter->formatCell('case', self::CELL_WIDTH, FormatterHelper::ALIGN_RIGHT, 'title');
 
         foreach ($adapters as $adapter) {
             $this->buffer.= ' '.$this->formatter->formatCell($adapter->getName(), self::CELL_WIDTH, FormatterHelper::ALIGN_RIGHT, 'title');
@@ -58,13 +59,13 @@ class ReportHelper extends Helper
     public function addReport(Report $report, array $cases, array $adapters)
     {
         foreach ($cases as $index => $case) {
-            $this->buffer.= ' '.$this->formatter->formatCell($index, self::CELL_WIDTH);
+            $this->buffer.= ' '.$this->formatter->formatCell($index, self::CELL_WIDTH, FormatterHelper::ALIGN_RIGHT);
 
             foreach ($adapters as $adapter) {
                 $this->addTime($report, $case->getName(), $adapter->getName());
             }
 
-            $this->buffer.= "\n\n";
+            $this->buffer.= "\n";
         }
 
         return $this;
@@ -72,10 +73,10 @@ class ReportHelper extends Helper
 
     public function addCases(array $cases)
     {
-        $this->buffer.= '<comment>';
+        $this->buffer.= "\n<comment>";
 
         foreach ($cases as $index => $case) {
-            $this->buffer.= $this->formatter->formatCell($index, self::CELL_WIDTH, FormatterHelper::ALIGN_RIGHT);
+            $this->buffer.= '<info>'.$this->formatter->formatCell($index, self::CELL_WIDTH, FormatterHelper::ALIGN_RIGHT).'</info>';
             $this->buffer.= ' '.$case->getDescription()."\n";
         }
 

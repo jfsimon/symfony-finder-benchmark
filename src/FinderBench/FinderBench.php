@@ -71,4 +71,9 @@ class FinderBench
     {
         return $this->cases;
     }
+
+    public function getIterations()
+    {
+        return $this->runner->getIterations();
+    }
 }
