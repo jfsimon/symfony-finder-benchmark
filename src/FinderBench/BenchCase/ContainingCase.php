@@ -7,7 +7,7 @@ use Symfony\Component\Finder\Finder;
 /**
  * @author Jean-François Simon <contact@jfsimon.fr>
  */
-class NameContainsCase extends AbstractCase
+class ContainingCase extends AbstractCase
 {
     private $contains;
     private $notContains;

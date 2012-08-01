@@ -29,9 +29,10 @@ class FilesTree
         $root = $root ?: $this->root;
 
         $this->syst->mkdir($root);
-        $this->syst->touch(array_map(function ($char) use ($root, $prefix) {
-            return $root.DIRECTORY_SEPARATOR.$prefix.$char.'.file';
-        }, $this->range));
+
+        foreach ($this->range as $char) {
+            file_put_contents($root.DIRECTORY_SEPARATOR.$prefix.$char.'.file', $prefix.$char);
+        }
 
         if ($depth < $this->depth) {
             foreach ($this->range as $char) {
@@ -47,11 +48,6 @@ class FilesTree
         $this->syst->remove($this->root);
 
         return $this;
-    }
-
-    public function getRoot()
-    {
-        return $this->root;
     }
 
     public function getFilesCount()

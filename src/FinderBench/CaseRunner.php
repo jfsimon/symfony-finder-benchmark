@@ -47,9 +47,4 @@ class CaseRunner
 
         return $count > 0 ? array_sum($times) / $count : null;
     }
-
-    public function getIterations()
-    {
-        return $this->iterations;
-    }
 }

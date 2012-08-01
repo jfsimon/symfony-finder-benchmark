@@ -24,6 +24,69 @@ class Application extends BaseApplication
     public function __construct()
     {
         parent::__construct('FinderBench', 'Beta');
+
+        $this->cases = array(
+
+            // name
+            new BenchCase\NamedCase(array('a*'), array()),
+            new BenchCase\NamedCase(array('~^a~'), array()),
+            new BenchCase\NamedCase(array('a*'), array('*a')),
+            new BenchCase\NamedCase(array('~^a.*~'), array('~.*a$~')),
+            new BenchCase\NamedCase(array('ab*'), array('*ba')),
+            new BenchCase\NamedCase(array('~^ab.*~'), array('~.*ba$~')),
+
+            // values
+            new BenchCase\ValuedCase('depth', 1, 3),
+            new BenchCase\ValuedCase('depth', 2, 2),
+            new BenchCase\ValuedCase('size', 1, 3),
+            new BenchCase\ValuedCase('size', 2, 2),
+
+            // sorts
+            new BenchCase\SortedFilesCase(BenchCase\SortedFilesCase::BY_ACCESSED),
+            new BenchCase\SortedFilesCase(BenchCase\SortedFilesCase::BY_CHANGED),
+            new BenchCase\SortedFilesCase(BenchCase\SortedFilesCase::BY_MODIFIED),
+            new BenchCase\SortedFilesCase(BenchCase\SortedFilesCase::BY_NAME),
+            new BenchCase\SortedFilesCase(BenchCase\SortedFilesCase::BY_TYPE),
+
+            // content
+            new BenchCase\ContainingCase(array('~^a~'), array()),
+            new BenchCase\ContainingCase(array('~^a.*~'), array('~.*a$~')),
+            new BenchCase\ContainingCase(array('~^ab.*~'), array('~.*ba$~')),
+
+//            // composed
+//            new BenchCase\ComposedCase(array(
+//                new BenchCase\NamedCase(array('~^a.*~'), array('~.*a$~')),
+//                new BenchCase\SortedFilesCase(BenchCase\SortedFilesCase::BY_MODIFIED),
+//            )),
+//            new BenchCase\ComposedCase(array(
+//                new BenchCase\NamedCase(array('~^ab.*~'), array('~.*ba$~')),
+//                new BenchCase\SortedFilesCase(BenchCase\SortedFilesCase::BY_NAME),
+//                new BenchCase\ValuedCase('depth', 1, 3),
+//                new BenchCase\ValuedCase('size', 1, 20),
+//            )),
+//            new BenchCase\ComposedCase(array(
+//                new BenchCase\ContainingCase(array('~^a.*~'), array('~.*a$~')),
+//                new BenchCase\SortedFilesCase(BenchCase\SortedFilesCase::BY_MODIFIED),
+//            )),
+//            new BenchCase\ComposedCase(array(
+//                new BenchCase\NamedCase(array('~^ab.*~'), array('~.*ba$~')),
+//                new BenchCase\ContainingCase(array('~^ab.*~'), array('~.*ba$~')),
+//                new BenchCase\SortedFilesCase(BenchCase\SortedFilesCase::BY_MODIFIED),
+//                new BenchCase\ValuedCase('depth', 1, 3),
+//            )),
+//            new BenchCase\ComposedCase(array(
+//                new BenchCase\NamedCase(array('~^ab.*~'), array('~.*ba$~')),
+//                new BenchCase\ContainingCase(array('~^ab.*~'), array('~.*ba$~')),
+//                new BenchCase\SortedFilesCase(BenchCase\SortedFilesCase::BY_NAME),
+//                new BenchCase\ValuedCase('depth', 1, 3),
+//                new BenchCase\ValuedCase('size', 1, 20),
+//            )),
+        );
+
+        $this->adapters = array(
+            new Adapter\PhpAdapter(),
+            new Adapter\GnuFindAdapter(),
+        );
     }
 
     public function run(InputInterface $input = null, OutputInterface $output = null)
@@ -36,38 +99,6 @@ class Application extends BaseApplication
                 'title'   => new OutputFormatterStyle('white', 'blue'),
             )));
         }
-
-        $this->cases = array(
-            new BenchCase\NameContainsCase(array('a*'), array()),
-            new BenchCase\ComposedCase(array(
-                new BenchCase\NameContainsCase(array('a*'), array()),
-                new BenchCase\NameContainsCase(array('a*'), array('*b')),
-            )),
-            new BenchCase\SortedFilesCase(BenchCase\SortedFilesCase::BY_NAME),
-            new BenchCase\SortedFilesCase(BenchCase\SortedFilesCase::BY_MODIFIED),
-            new BenchCase\ComposedCase(array(
-                new BenchCase\NameContainsCase(array('a*'), array()),
-                new BenchCase\SortedFilesCase(BenchCase\SortedFilesCase::BY_NAME),
-            )),
-            new BenchCase\ValuedCase('depth', 2),
-            new BenchCase\ComposedCase(array(
-                new BenchCase\NameContainsCase(array('a*'), array()),
-                new BenchCase\SortedFilesCase(BenchCase\SortedFilesCase::BY_NAME),
-                new BenchCase\ValuedCase('depth', 2),
-            )),
-            new BenchCase\ValuedCase('size', 2),
-            new BenchCase\ComposedCase(array(
-                new BenchCase\NameContainsCase(array('a*'), array()),
-                new BenchCase\SortedFilesCase(BenchCase\SortedFilesCase::BY_NAME),
-                new BenchCase\ValuedCase('depth', 2),
-                new BenchCase\ValuedCase('size', 2),
-            )),
-        );
-
-        $this->adapters = array(
-            new Adapter\PhpAdapter(),
-            new Adapter\GnuFindAdapter(),
-        );
 
         return parent::run($input, $output);
     }

@@ -1,5 +1,5 @@
 {
-    "hash": "54510eb96b997b4a73744587d1c82a6b",
+    "hash": "38eafc28cfa1b19bfeb65106e26577ea",
     "packages": [
         {
             "package": "doctrine/common",
@@ -8,12 +8,12 @@
         {
             "package": "symfony/symfony",
             "version": "dev-issue-4031",
-            "source-reference": "dee6f9c9c286e2e13414a77fe3ace522d234d3a3",
-            "commit-date": "1341908169"
+            "source-reference": "144c61bb204e34304086c40535731d5ccb77243f",
+            "commit-date": "1343845600"
         },
         {
             "package": "twig/twig",
-            "version": "v1.8.3"
+            "version": "v1.9.1"
         }
     ],
     "packages-dev": null,
