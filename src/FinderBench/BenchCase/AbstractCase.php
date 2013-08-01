@@ -2,6 +2,7 @@
 
 namespace FinderBench\BenchCase;
 
+use FinderBench\Profiler;
 use Symfony\Component\Finder\Adapter\AdapterInterface;
 use Symfony\Component\Finder\Finder;
 
@@ -10,14 +11,30 @@ use Symfony\Component\Finder\Finder;
  */
 abstract class AbstractCase implements CaseInterface
 {
-    public function run(AdapterInterface $adapter, $root)
+    private $profiler;
+
+    public function profile(Profiler $profiler)
+    {
+        $this->profiler = $profiler;
+    }
+
+    public function run(AdapterInterface $adapter, $root, $profile = false)
     {
         $time   = $this->getMicrotime();
-        $finder = Finder::create()->removeAdapters()->register($adapter);
+        $finder = Finder::create()->removeAdapters()->addAdapter($adapter);
 
         $this->buildFinder($finder);
+
+        if ($profile) {
+            $this->profiler->start();
+        }
+
         foreach ($finder->in($root) as $file) {
             continue;
+        }
+
+        if ($profile) {
+            $this->profiler->end($adapter->getName().'_'.$this->getName());
         }
 
         return $this->getMicrotime() - $time;

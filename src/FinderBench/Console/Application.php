@@ -2,6 +2,7 @@
 
 namespace FinderBench\Console;
 
+use FinderBench\Profiler;
 use Symfony\Component\Console\Application as BaseApplication;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -83,8 +84,14 @@ class Application extends BaseApplication
 //            )),
         );
 
+        $profiler = new Profiler(__DIR__.'/../../../profiles');
+        foreach ($this->cases as $case) {
+            $case->profile($profiler);
+        }
+
         $this->adapters = array(
             new Adapter\PhpAdapter(),
+            new Adapter\RecursivePhpAdapter(),
             new Adapter\GnuFindAdapter(),
         );
     }

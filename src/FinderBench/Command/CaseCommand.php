@@ -19,9 +19,9 @@ class CaseCommand extends Command
         $this
             ->setName('case')
             ->setDescription('Runs bench case.')
-            ->addArgument('index',      InputArgument::REQUIRED, 'Case index')
+            ->addArgument('index', InputArgument::REQUIRED, 'Case index')
             ->addArgument('iterations', InputArgument::REQUIRED, 'Runner iterations')
-            ->addArgument('root',       InputArgument::REQUIRED, 'Workspace root dir')
+            ->addArgument('root', InputArgument::REQUIRED, 'Workspace root dir')
         ;
     }
 

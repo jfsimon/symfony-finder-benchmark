@@ -15,12 +15,8 @@
         "psr-0": { "": "src/" }
     },
     "bin": ["bin/benchmark"],
-    "repositories": [{
-        "type": "vcs",
-        "url": "https://github.com/jfsimon/symfony.git"
-    }],
-    "require": {
-        "symfony/symfony": "dev-issue-4031"
+        "require": {
+        "symfony/symfony": "dev-master"
     },
     "minimum-stability": "beta"
 }

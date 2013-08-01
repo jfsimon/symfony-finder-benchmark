@@ -39,6 +39,9 @@ class CaseRunner
         // file system warmup
         $test->run($adapter, $this->root);
 
+        // profiling
+        $test->run($adapter, $this->root, true);
+
         for ($iteration = 0; $iteration < $this->iterations; $iteration ++) {
             $times[] = $test->run($adapter, $this->root);
         }

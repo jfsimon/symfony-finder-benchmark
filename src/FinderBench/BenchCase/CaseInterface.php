@@ -2,6 +2,7 @@
 
 namespace FinderBench\BenchCase;
 
+use FinderBench\Profiler;
 use Symfony\Component\Finder\Adapter\AdapterInterface;
 
 /**
@@ -9,7 +10,8 @@ use Symfony\Component\Finder\Adapter\AdapterInterface;
  */
 interface CaseInterface
 {
+    function profile(Profiler $profiler);
     function getName();
     function getDescription();
-    function run(AdapterInterface $adapter, $root);
+    function run(AdapterInterface $adapter, $root, $profile = false);
 }
