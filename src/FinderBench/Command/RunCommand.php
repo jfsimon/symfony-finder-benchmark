@@ -17,8 +17,6 @@ use Symfony\Component\Process\Process;
  */
 class RunCommand extends Command
 {
-    const PROCESS_TIMEOUT = 600;
-
     protected function configure()
     {
         $this
@@ -28,6 +26,8 @@ class RunCommand extends Command
             ->addOption('size',       's', InputOption::VALUE_REQUIRED, 'Files tree size',    10)
             ->addOption('depth',      'd', InputOption::VALUE_REQUIRED, 'Files tree depth',   3)
             ->addOption('iterations', 'i', InputOption::VALUE_REQUIRED, 'Bench iterations',   10)
+            ->addOption('case',      null, InputOption::VALUE_REQUIRED, 'Bench case index',   null)
+            ->addOption('profile',   null, InputOption::VALUE_REQUIRED, 'Display profile',    null)
         ;
     }
 
@@ -35,7 +35,9 @@ class RunCommand extends Command
     {
         $files = new FilesTree($input->getOption('root'),$input->getOption('size'), $input->getOption('depth'));
 
-        $this->process(sprintf('init %s %s %s', $input->getOption('root'), $input->getOption('size'), $input->getOption('depth')), $output);
+        $this->getApplication()->processCommand(sprintf(
+            'init %s %s %s', $input->getOption('root'), $input->getOption('size'), $input->getOption('depth')
+        ), $output);
 
         $output->write($this->getHelper('report')->formatDetails(array(
             'files'       => $files->getFilesCount(),
@@ -47,20 +49,27 @@ class RunCommand extends Command
 
         $output->write($this->getHelper('report')->formatHeader($this->getApplication()->getAdapters()));
 
-        foreach (array_keys($this->getApplication()->getCases()) as $index) {
-            $this->process(sprintf('case %s %s %s', $index, $input->getOption('iterations'),$input->getOption('root')), $output);
+        if ($input->getOption('case')) {
+            $this->processCase($input->getOption('case'), $input, $output);
+        } else {
+            foreach (array_keys($this->getApplication()->getCases()) as $index) {
+                $this->processCase($index, $input, $output);
+            }
         }
 
         $output->write($this->getHelper('report')->formatCases($this->getApplication()->getCases()));
 
-        $this->process(sprintf('finalize %s', $input->getOption('root')), $output);
+        $this->getApplication()->processCommand(sprintf('finalize %s', $input->getOption('root')), $output);
     }
 
-    private function process($command, $output)
+    private function processCase($index, InputInterface $input, OutputInterface $output)
     {
-        $process = new Process('bin/benchmark '.$command, realpath(__DIR__.'/../../..'), null, null, self::PROCESS_TIMEOUT);
-        $process->run(function($type, $out) use ($output) {
-            $output->write($out);
-        });
+        $command = sprintf('case %s %s %s', $index, $input->getOption('iterations'), $input->getOption('root'));
+
+        if ($input->getOption('profile')) {
+            $command .= sprintf(' --profile="%s"', $input->getOption('profile'));
+        }
+
+        $this->getApplication()->processCommand($command, $output);
     }
 }

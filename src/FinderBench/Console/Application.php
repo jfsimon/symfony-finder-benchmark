@@ -4,6 +4,7 @@ namespace FinderBench\Console;
 
 use FinderBench\Profiler;
 use Symfony\Component\Console\Application as BaseApplication;
+use Symfony\Component\Console\Helper\TableHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Output\ConsoleOutput;
@@ -13,6 +14,7 @@ use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Finder\Adapter;
 use FinderBench\Command;
 use FinderBench\BenchCase;
+use Symfony\Component\Process\Process;
 
 /**
  * @author Jean-François Simon <jeanfrancois.simon@sensiolabs.com>
@@ -84,7 +86,7 @@ class Application extends BaseApplication
 //            )),
         );
 
-        $profiler = new Profiler(__DIR__.'/../../../profiles');
+        $profiler = new Profiler($this->getProfilerDir());
         foreach ($this->cases as $case) {
             $case->profile($profiler);
         }
@@ -94,6 +96,16 @@ class Application extends BaseApplication
             new Adapter\RecursivePhpAdapter(),
             new Adapter\GnuFindAdapter(),
         );
+    }
+
+    public function getProfilerDir()
+    {
+        $directory = __DIR__.'/../../../profiles';
+        if (!file_exists($directory)) {
+            mkdir($directory);
+        }
+
+        return $directory;
     }
 
     public function run(InputInterface $input = null, OutputInterface $output = null)
@@ -120,13 +132,22 @@ class Application extends BaseApplication
         return $this->adapters;
     }
 
+    public function processCommand($command, OutputInterface $output)
+    {
+        $process = new Process('bin/benchmark '.$command, realpath(__DIR__.'/../../..'), null, null, 600);
+        $process->run(function($type, $out) use ($output) {
+            $output->write($out);
+        });
+    }
+
     protected function getDefaultCommands()
     {
         $commands = parent::getDefaultCommands();
-        $commands[] = new Command\RunCommand();
-        $commands[] = new Command\InitCommand();
         $commands[] = new Command\CaseCommand();
         $commands[] = new Command\FinalizeCommand();
+        $commands[] = new Command\InitCommand();
+        $commands[] = new Command\ProfileCommand();
+        $commands[] = new Command\RunCommand();
 
         return $commands;
     }
@@ -136,6 +157,7 @@ class Application extends BaseApplication
         return new HelperSet(array(
             $formatter = new FormatterHelper(),
             new ReportHelper($formatter, $this->getTerminalWidth()),
+            new TableHelper(),
         ));
     }
 }

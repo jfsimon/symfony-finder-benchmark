@@ -22,6 +22,7 @@ class CaseCommand extends Command
             ->addArgument('index', InputArgument::REQUIRED, 'Case index')
             ->addArgument('iterations', InputArgument::REQUIRED, 'Runner iterations')
             ->addArgument('root', InputArgument::REQUIRED, 'Workspace root dir')
+            ->addOption('profile', null, InputOption::VALUE_REQUIRED, 'Profile to display')
         ;
     }
 
@@ -38,5 +39,10 @@ class CaseCommand extends Command
         $report = $runner->run($cases[$index], $this->getApplication()->getAdapters());
 
         $output->write($this->getHelper('report')->formatCase($report, $index));
+
+        if ($input->getOption('profile')) {
+            $profileName = $input->getOption('profile').'_'.$cases[$index]->getName();
+            $this->getApplication()->processCommand(sprintf('profile %s', $profileName), $output);
+        }
     }
 }

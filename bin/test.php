@@ -1,21 +1,11 @@
 <?php
 
-namespace ns;
+$run = function ($name, \Closure $test) {
+    xhprof_enable();
+    for ($i = 0; $i < 12220; $i++) { $test(); }
+    $data = xhprof_disable();
+    $time = array_sum(array_map(function (array $entry) { return $entry['wt']; }, $data));
+    echo "$name: $time\n";
+};
 
-require __DIR__.'/../src/bootstrap.php';
-
-use Symfony\Component\Yaml\Yaml;
-
-class test {
-    function a() { usleep(10); $s = 'hello'; for($i=1;$i<1000;$i++) $s = sha1($s); }
-    function b() { $this->a(); }
-    function c() { $this->a(); $this->a(); $this->a(); $this->a(); }
-    function d() {
-        xhprof_enable(XHPROF_FLAGS_CPU + XHPROF_FLAGS_MEMORY);
-        $this->b(); $this->c();
-        echo Yaml::dump(xhprof_disable());
-    }
-}
-
-$t = new test();
-$t->d();
+$run('SplFileInfo', function () { new \SplFileInfo(__FILE__); });

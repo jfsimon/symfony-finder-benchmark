@@ -25,9 +25,7 @@ class Profiler
 
     public function end($name)
     {
-        file_put_contents(
-            $this->dumpDir.DIRECTORY_SEPARATOR.$name.'_'.str_replace(array(' ', '.'), '', microtime()),
-            serialize(xhprof_disable())
-        );
+        $path = $this->dumpDir.DIRECTORY_SEPARATOR.$name;
+        file_put_contents($path, serialize(xhprof_disable()));
     }
 }
