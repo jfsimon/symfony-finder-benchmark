@@ -36,7 +36,7 @@ class ContainingCase extends AbstractCase
 
     public function getDescription()
     {
-        $desc = 'Find files by name';
+        $desc = 'Find files by content';
 
         if (count($this->contains)) {
             $desc.= ' containing '.implode('|', $this->contains);
